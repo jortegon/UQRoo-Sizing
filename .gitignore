@@ -1,6 +1,14 @@
 #MacOS stuff
 .DS_Store
 
+#NREL data
+datos_solar_eolico/
+
+#venv
+bin/
+share/
+pyvenv.cfg
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
