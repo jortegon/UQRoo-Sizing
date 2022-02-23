@@ -1,0 +1,48 @@
+{% extends 'varios/index.html'%}
+
+{% block title %}Fuente de energía eólica {% endblock %}
+{%block content %}
+
+
+    <form action="../hidrogeno/" method="POST">
+        {% csrf_token %}
+
+        
+        <label class="form-check-label" for="defaultCheck1">
+            Desea agregar energía eólica ?
+          </label>
+        {{SolarForm.elegir_generador_eolico}}
+
+        <div id="amor">
+        <label class="form-check-label" for="defaultCheck1">
+            Seleccionar tipo de aerogenerador
+          </label>
+        {{SolarForm.tipo_generador_eolico}}
+      </div>
+       
+        <div class="mt-2">
+            <input class="btn btn-primary" type="submit" value="Siguiente">
+        </div>
+</form>
+
+<script type="text/javascript">
+element = document.getElementById('amor');
+element.style.display = 'none';
+
+  function showContent() {
+   
+      element = document.getElementById('amor');
+      estado = element.style.display;
+      if(estado == 'none'){
+        element.style.display='block'
+      }else{
+      element.style.display = 'none'; 
+      }
+  
+  }
+  
+</script>
+    
+
+{% endblock %}
+

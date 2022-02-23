@@ -1,0 +1,21 @@
+{% extends 'varios/index.html' %}
+{% block title %} Subir archivo de configuración {% endblock %}
+
+{% block content %}
+
+
+    <form action="../resultado/" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+  
+        
+         <!-- <input type="file" class="form-control-file" id="exampleFormControlFile1" name = "login_name"> -->
+          {{SolarForm.carga_o}}
+    
+      <input type="hidden" name="carga_o" value="configuracion">
+      <div class="mt-2">
+        <button type="submit" class="btn btn-primary mt-2" value="login">Entrar</button>
+      </div>
+    
+  </form>
+ 
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'varios/index.html' %}
+
+    {% block title %}Seleccione el archivo con la carga en KWh/mes {% endblock %}
+    {%block content %}
+    <form action="../paneles/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{SolarForm.carga_o}}
+        
+        <!--<input type="file" name="carga_o" value="carga_o_kwh"> -->
+        <input type="hidden" name="carga_o" value="carga_o_mes">
+       
+        <div class="mt-2">
+            <button class="btn btn-primary" type="submit">Enviar</button> 
+   </form>
+  {% endblock %}

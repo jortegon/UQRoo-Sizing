@@ -1,0 +1,24 @@
+{% extends 'varios/index.html' %}
+
+{% block title %} Carga {% endblock %}
+{% block content %}
+ 
+    
+    <form action="../paneles/" method="POST">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-check-label" for="defaultCheck1">
+                    Ingrese la carga en KWh/día
+                  </label>
+                 {{SolarForm.carga}}
+            </div>
+            
+            <input type="hidden" name="carga_o" value="carga_o">
+            <div class="mt-2">
+                <input class="btn btn-primary" type="submit" value="Siguiente">
+            </div>
+    </form>
+    
+   <!--"../paneles/"-->
+  {% endblock %}  

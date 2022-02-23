@@ -1,0 +1,46 @@
+{% extends 'varios/index.html' %}
+
+{% block title %} Fuente de energía solar {% endblock %}
+{% block content %}
+
+
+    <form action="../viento/" method="POST">
+            {% csrf_token %}
+            
+            <label for="exampleFormControlFile1">Agregar energía solar ?</label>
+            {{SolarForm.elegir_energia_solar}}
+        
+           <!-- <input type="checkbox" name="is_closed" value="closed" {% if 'closed' in 'is_closed' %} checked {% else %} '' {% endif %}> -->
+
+           <div id="amor">
+           <label class="form-check-label" for="defaultCheck1">
+            Elija el tipo de panel
+          </label>
+            {{SolarForm.tipo_paneles }}
+        </div>
+           
+            <div class="mt-2">
+                <input class="btn btn-primary" type="submit" value="Siguiente">
+            </div>
+    </form>
+
+    <script type="text/javascript">
+        element = document.getElementById('amor');
+        element.style.display = 'none';
+        
+          function showContent() {
+           
+              element = document.getElementById('amor');
+              estado = element.style.display;
+              if(estado == 'none'){
+                element.style.display='block'
+              }else{
+              element.style.display = 'none'; 
+              }
+          
+          }
+          
+        </script>
+ 
+{% endblock %}
+

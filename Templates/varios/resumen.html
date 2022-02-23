@@ -1,0 +1,83 @@
+{% extends 'varios/index.html' %}
+
+{% block title %} Resumen de la configuración {% endblock %}
+{% block content %}
+    <h2>La configuración que ha elegido es la siguiente: </h2>
+
+    {% if carga %}
+       Carga <strong>{{carga}} kW</strong>
+    {% else %}
+
+    <ul> <h3> CARGA LEIDA DESDE EL CVS </h2>
+        {% for athlete in cvs %}
+            <li>{{ athlete.carga }} kW</li>
+        {% endfor %}
+        </ul>
+
+    {% endif %}
+
+    <br>
+    {% if elegir_eolico == "on" %}
+        <h4>Energía eólica</h4>
+        Su proyecto incluirá <strong>Energía eólica</strong>  <br>
+        {% if tipo_eolico == 1 %}
+         El tipo de aerogenerador seleccionado es el <strong>Genérico</strong> <br>
+        {% elif tipo_eolico == 2 %}
+        El tipo de aerogenerador seleccionado es el <strong>Horizontal</strong> <br>
+        {% elif tipo_eolico == 3 %}
+        El tipo de aerogenerador seleccionado es el <strong>Vertical</strong> <br>
+        {% endif %}
+    {% else %}
+        <!--No seleccionó Energía eólica -->
+    {% endif %}
+    <br>
+    {% if elegir_solar == "on" %}
+        <h4>Energía Solar</h4>
+        Su proyecto incluirá <strong>Energía Solar</strong>  <br>
+        {% if tipo_panel == 1 %}
+         El tipo de panel seleccionado es el <strong>Genérico</strong> <br>
+        {% elif tipo_panel == 2 %}
+        El tipo de panel seleccionado es el <strong>Monocristalino</strong> <br>
+        {% elif tipo_panel == 3 %}
+        El tipo de panel seleccionado es el <strong>Policristalino</strong> <br>
+        {% endif %}
+    {% else %}
+        <!--No seleccionó Energía Solar -->
+    {% endif %}
+    
+    <br>
+    {% if elegir_celda == "on" %}
+        <h4>Hidrógeno</h4>
+        Su proyecto incluirá <strong>Almacenamiento en Hidrógeno</strong>  <br>
+        {% if tipo_celda == 1 %}
+         El tipo de celda seleccionada es <strong>Membrana de Intercambio Protónico (PEMFC)</strong> <br>
+        {% endif %}
+    {% else %}
+        <!--No seleccionó Energía Solar -->
+    {% endif %}
+    
+    <br/>
+    <form method="POST" action="../resultado/">
+        {% csrf_token %}
+        <input type="hidden" name="carga_o" value="resumen">
+        <button type="submit" class="btn btn-primary" value="login" onclick="myFunction()">Siguiente</button> 
+    </form>
+    <div>
+        <progress id="dynamic"  min = "0" max="100" value="0"> </progress>
+    </div>
+    
+
+    <!--<a class="btn btn-primary" href="{% url 'hibrido:resultado'%}"><h1>Siguiente</h1></a> -->
+    <script>
+        function myFunction() {
+            const elem = document.getElementById("dynamic");
+            setInterval (()=>{
+                elem.value+=0.01;
+                if (elem.value===100){
+                    elem.value = 0;
+                }
+            },50)
+            
+    }
+    </script>
+{% endblock %}

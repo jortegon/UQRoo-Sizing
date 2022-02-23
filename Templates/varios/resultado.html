@@ -1,0 +1,473 @@
+{% extends 'varios/index.html' %}
+
+
+{% block title %} RESULTADOS DEL DIMENSIONAMIENTO {% endblock %}
+{% block content %}
+<button onclick="downloadFile()">Download file</button>
+    
+        {% if solar == "on" and eolico == "off" %}
+        
+      <p></p>
+
+        <!-- inicia tabla prueba-->
+        <table class="table">
+          <thead class="bg-success">
+            <tr>
+              <th scope="col">Número de paneles</th>
+              <th scope="col">Potencia del inversor</th>
+              <th scope="col">Capital anual</th>
+              <th scope="col">Mantenimiento anual</th>
+              <th scope="col">Ángulo óptimo paneles</th>
+              <th scope="col">Potencia Electrolizador</th>
+              <th scope="col">Potencia Celda</th>
+              <th scope="col">Tanque H2</th>
+              <th scope="col">Eficiencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ numeropaneles }}</td>
+              <td>{{ potenciaInversor }}kW</td>
+              <td>{{ capital }}</td>
+              <td>{{ mantenimiento }}</td>
+              <td>{{ angulo_maxima_potencia }}&#176</td>
+              <td>{{ electrolizador }} kW</td>
+              <td>{{ celda }} kW</td>
+              <td>{{ tamano_tanque_hidrogeno }} kW</td>
+              <td>{{EficienciaGlobal}}%</td>
+            </tr>
+           
+          </tbody>
+        </table>
+
+        <!-- Termina tabla prueba-->
+<!-- Logica descargar archivo-->
+
+
+<!-- Fin Logica descargar archivo-->
+<canvas id="speedChart" width="600" height="300"></canvas>
+<!--https://www.chartjs.org/docs/latest/axes/-->
+<script>
+
+ var irradiancia = {{energia|safe}};
+ var potenciaSolar = {{potenciaS|safe}};
+ var carga = {{load|safe}};
+ 
+ x = [];
+ for (var i = 0; i< 361 ; i++){
+     
+        x[i] = i;  
+ }
+ 
+var speedCanvas = document.getElementById("speedChart");
+
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 18; /* 18 */
+
+var dataFirst = {
+    label: "Irradiancia (kW/m^2)",
+    data: irradiancia,
+    lineTension: 0,
+    fill: false,
+    borderColor: 'red'
+  };
+
+var dataSecond = {
+    label: "Energía solar (kWh)",
+    data: potenciaSolar,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'blue'
+  };
+
+  var dataThird = {
+    label: "Carga (kW)",
+    data: carga,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'green'
+  };
+
+var speedData = {
+  labels: x,
+  datasets: [dataFirst, dataSecond, dataThird]
+};
+
+var chartOptions = {
+  legend: {
+    display: true,
+    position: 'top',
+    labels: {
+      boxWidth: 50,
+      fontColor: 'black'
+    }
+  }
+};
+
+var lineChart = new Chart(speedCanvas, {
+  type: 'line',
+  data: speedData,
+  options: chartOptions
+});
+
+
+// Código para descargar archivo
+function arrayObjToCsv(ar) {
+	//comprobamos compatibilidad
+	if(window.Blob && (window.URL || window.webkitURL)){
+		var contenido = "",
+			d = new Date(),
+			blob,
+			reader,
+			save,
+			clicEvent;
+		//creamos contenido del archivo
+		for (var i = 0; i < ar.length; i++) {
+			if (i == 0)
+				contenido += Object.keys(ar[i]).join(";") + "\n";
+			//resto del contenido
+			contenido += Object.keys(ar[i]).map(function(key){
+							return ar[i][key];
+						}).join(";") + "\n";
+		}
+		//creamos el blob
+		blob =  new Blob(["\ufeff", contenido], {type: 'text/csv'});
+		//creamos el reader
+		var reader = new FileReader();
+		reader.onload = function (event) {
+			//escuchamos su evento load y creamos un enlace en dom
+			save = document.createElement('a');
+			save.href = event.target.result;
+			save.target = '_blank';
+			//aquí le damos nombre al archivo
+			save.download = "log_"+ d.getDate() + "_" + (d.getMonth()+1) + "_" + d.getFullYear() +".csv";
+			try {
+				//creamos un evento click
+				clicEvent = new MouseEvent('click', {
+					'view': window,
+					'bubbles': true,
+					'cancelable': true
+				});
+			} catch (e) {
+				//si llega aquí es que probablemente implemente la forma antigua de crear un enlace
+				clicEvent = document.createEvent("MouseEvent");
+				clicEvent.initEvent('click', true, true);
+			}
+			//disparamos el evento
+			save.dispatchEvent(clicEvent);
+			//liberamos el objeto window.URL
+			(window.URL || window.webkitURL).revokeObjectURL(save.href);
+		}
+		//leemos como url
+		reader.readAsDataURL(blob);
+	}else {
+		//el navegador no admite esta opción
+		alert("Su navegador no permite esta acción");
+	}
+};
+
+function downloadFile() {
+  
+  var miArrayDeObjetos = [1.1,1.2,1.3,1.4,1.5]
+  alert("Prueba");
+  console.log(miArrayDeObjetos);
+  console.log(typeof(miArrayDeObjetos));
+	arrayObjToCsv(miArrayDeObjetos);
+}
+
+// Fin código descargar archivo
+
+</script>
+
+
+        {% elif solar == "off" and eolico == "on" %}
+
+        <!--Inicia tabla nueva-->
+
+        <table class="table">
+          <thead class="bg-warning">
+            <tr>
+              <th scope="col">Número de aerogeneradores</th>
+              <th scope="col">Potencia del inversor</th>
+              <th scope="col">Capital anual</th>
+              <th scope="col">Mantenimiento anual</th>
+              <th scope="col">Potencia Electrolizador</th>
+              <th scope="col">Potencia Celda</th>
+              <th scope="col">Tanque H2</th>
+              <th scope="col">Eficiencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ numeroaerogeneradores }}</td>
+              <td>{{ potenciaInversor }}kW</td>
+              <td>{{ capital }}</td>
+              <td>{{ mantenimiento }}</td>
+              <td>{{ electrolizador }} kW</td>
+              <td>{{ celda }} kW</td>
+              <td>{{ tamano_tanque_hidrogeno }} kW</td>
+              <td>{{ EficienciaGlobal }}%</td>
+            </tr>
+           
+          </tbody>
+        </table>
+
+
+        <!--Termina tabla nueva-->
+
+
+<canvas id="speedChart" width="600" height="300"></canvas>
+<!--https://www.chartjs.org/docs/latest/axes/-->
+<script>
+
+ var velocidad_viento = {{velocidad_viento|safe}};
+ var potenciaE = {{potenciaE|safe}};
+ var carga = {{load|safe}};
+ 
+ x = [];
+ for (var i = 0; i< 361 ; i++){
+     
+        x[i] = i;  
+ }
+ 
+var speedCanvas = document.getElementById("speedChart");
+
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 15; /* 18 */
+
+var dataFirst = {
+    label: "Velocidad del viento (m/s)",
+    data: velocidad_viento,
+    lineTension: 0,
+    fill: false,
+    borderColor: 'red'
+  };
+
+var dataSecond = {
+    label: "Energía eólica (kWh)",
+    data: potenciaE,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'blue'
+  };
+
+  var dataThird = {
+    label: "Carga (kW)",
+    data: carga,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'green'
+  };
+
+var speedData = {
+  labels: x,
+  datasets: [dataFirst, dataSecond, dataThird]
+};
+
+var chartOptions = {
+  legend: {
+    display: true,
+    position: 'top',
+    labels: {
+      boxWidth: 50,
+      fontColor: 'black'
+    }
+  }
+};
+
+var lineChart = new Chart(speedCanvas, {
+  type: 'line',
+  data: speedData,
+  options: chartOptions
+});
+
+
+// Código para descargar archivo
+function arrayObjToCsv(ar) {
+	//comprobamos compatibilidad
+	if(window.Blob && (window.URL || window.webkitURL)){
+		var contenido = "",
+			d = new Date(),
+			blob,
+			reader,
+			save,
+			clicEvent;
+		//creamos contenido del archivo
+		for (var i = 0; i < ar.length; i++) {
+			//if (i == 0)
+				//contenido += Object.keys(ar[i]).join(";") + "\n";
+			//resto del contenido
+			contenido += Object.keys(ar[i]).map(function(key){
+							return ar[i];
+						}).join(";") + "\n";
+		}
+		//creamos el blob
+		blob =  new Blob(["\ufeff", contenido], {type: 'text/csv'});
+		//creamos el reader
+		var reader = new FileReader();
+		reader.onload = function (event) {
+			//escuchamos su evento load y creamos un enlace en dom
+			save = document.createElement('a');
+			save.href = event.target.result;
+			save.target = '_blank';
+			//aquí le damos nombre al archivo
+			save.download = "log_"+ d.getDate() + "_" + (d.getMonth()+1) + "_" + d.getFullYear() +".csv";
+			try {
+				//creamos un evento click
+				clicEvent = new MouseEvent('click', {
+					'view': window,
+					'bubbles': true,
+					'cancelable': true
+				});
+			} catch (e) {
+				//si llega aquí es que probablemente implemente la forma antigua de crear un enlace
+				clicEvent = document.createEvent("MouseEvent");
+				clicEvent.initEvent('click', true, true);
+			}
+			//disparamos el evento
+			save.dispatchEvent(clicEvent);
+			//liberamos el objeto window.URL
+			(window.URL || window.webkitURL).revokeObjectURL(save.href);
+		}
+		//leemos como url
+		reader.readAsDataURL(blob);
+	}else {
+		//el navegador no admite esta opción
+		alert("Su navegador no permite esta acción");
+	}
+};
+
+function downloadFile() {
+  
+  var arreglo = [
+		1.1,1.2,1.3,1.4,1.5,1.8,1.9
+    ];
+    
+	var miArrayDeObjetos = arreglo.map(String)
+	arrayObjToCsv(miArrayDeObjetos);
+  alert("Prueba");
+  console.log(miArrayDeObjetos);
+  console.log(typeof(miArrayDeObjetos));
+	arrayObjToCsv(miArrayDeObjetos);
+}
+
+// Fin código descargar archivo
+
+</script>
+
+      {% elif solar == "on" and eolico == "on" %}
+        
+        <table class="table">
+          <thead class="bg-warning">
+            <tr>
+              <th scope="col">Número de paneles</th>
+              <th scope="col">Número de aerogeneradores</th>
+              <th scope="col">Potencia del inversor</th>
+              <th scope="col">Capital anual</th>
+              <th scope="col">Mantenimiento anual</th>
+              <th scope="col">Ángulo óptimo paneles</th>
+              <th scope="col">Potencia Electrolizador</th>
+              <th scope="col">Potencia Celda</th>
+              <th scope="col">Tanque H2</th>
+              <th scope="col">Eficiencia</th>
+              
+            </tr>
+          </thead>
+            {% for i in zlista %}
+            <tr>
+            <td class="text-center">{{i.0}}</td>
+            <td class="text-center">{{i.1}}</td>
+            <td class="text-center">{{potenciaInversor}}kW</td>
+            <td class="text-center">{{i.2}}</td>
+            <td class="text-center">{{i.3}}</td>
+            <td class="text-center">{{angulo_maxima_potencia}}&#176</td>
+            <td>{{ electrolizador }} kW</td>
+            <td>{{ celda }} kW</td>
+            <td>{{ tamano_tanque_hidrogeno }} kW</td>
+            <td>{{ EficienciaGlobal }} %</td>
+            </tr>
+            {% endfor %}
+          
+        
+        </table>
+
+      <!-- Para la gráfica cuando se elije solar y eólica -->
+      <h2 class="text-center"> Gráfica </h2>
+      <canvas id="speedChart" width="600" height="300"></canvas>
+<!--https://www.chartjs.org/docs/latest/axes/-->
+<script>
+
+ var velocidad_viento = {{velocidad_viento|safe}};
+ var potenciaE = {{potenciaE|safe}};
+ var carga = {{load|safe}};
+ var irradiancia = {{energia|safe}};
+ 
+ x = [];
+ for (var i = 0; i< 361 ; i++){
+     
+        x[i] = i;  
+ }
+ 
+var speedCanvas = document.getElementById("speedChart");
+
+Chart.defaults.global.defaultFontFamily = "Lato";
+Chart.defaults.global.defaultFontSize = 15; /* 18 */
+
+var dataFirst = {
+    label: "Velocidad del viento (m/s)",
+    data: velocidad_viento,
+    lineTension: 0,
+    fill: false,
+    borderColor: 'red'
+  };
+
+var dataSecond = {
+    label: "Energía eólica y solar (kWh)",
+    data: potenciaE,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'blue'
+  };
+
+  var dataThird = {
+    label: "Carga (kW)",
+    data: carga,
+    lineTension: 0,
+    fill: false,
+  borderColor: 'green'
+  };
+
+  var dataCuarta = {
+    label: "Irradiancia (kW/m^2)",
+    data: irradiancia,
+    lineTension: 0,
+    fill: false,
+    borderColor: 'orange'
+  };
+
+var speedData = {
+  labels: x,
+  datasets: [dataFirst, dataSecond, dataThird, dataCuarta]
+};
+
+var chartOptions = {
+  legend: {
+    display: true,
+    position: 'top',
+    labels: {
+      boxWidth: 50,
+      fontColor: 'black'
+    }
+  }
+};
+
+var lineChart = new Chart(speedCanvas, {
+  type: 'line',
+  data: speedData,
+  options: chartOptions
+});
+
+</script>
+        
+      {% endif %}
+{% endblock %}

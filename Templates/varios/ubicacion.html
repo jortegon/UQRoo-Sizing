@@ -1,0 +1,28 @@
+{% extends 'varios/index.html' %}
+
+    {% block title %}Ubicación donde realizará el proyecto {% endblock %}
+    {% block content %}
+    <form action="../tipocarga/" method="POST">
+            {% csrf_token %}
+                
+                <div class="form-group">
+                    <h5>País</h5> {{SolarForm.pais}}
+                </div>
+
+                <div class="form-group">
+                    <h5>Estado</h5> {{SolarForm.estado}}
+                </div>
+
+                <div class="form-group">
+                    <h5>Municipio/Ciudad</h5> {{SolarForm.municipio}}
+                </div>
+                
+                <input type="hidden" name="ubicacion" value="ubicacion">
+            
+            <div class="mt-2">
+                <input class="btn btn-primary" type="submit" value="Siguiente">
+            </div>
+       
+    </form>
+    
+ {% endblock %}

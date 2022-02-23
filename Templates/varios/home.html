@@ -1,0 +1,16 @@
+{% extends 'varios/index.html' %}
+
+ 
+    {% block title %} Seleccione el formato de la carga {% endblock%}
+    {% block content %}
+    <form action="../camino/" method="POST">
+            {% csrf_token %}
+
+            {{SolarForm.elegir_carga}}
+           
+            <div class="mt-2">
+                <input class="btn btn-primary" type="submit" value="Siguiente">
+            </div>
+    </form>
+    {% endblock %}
+   <!--"../paneles/"-->

@@ -1,0 +1,133 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/docs/4.0/assets/img/favicons/favicon.ico">
+
+    <title> </title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sticky-footer-navbar/">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/sticky-footer-navbar.css' %}" rel="stylesheet">
+
+    <script src="{% static 'js/Chart.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/Chart.min.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+   <style> 
+   .abc {
+     width: 30%;
+     height: 150px;
+   }
+   
+     .imagen:hover{
+            border-radius:50%;
+            -webkit-border-radius:50%;
+            box-shadow: 0px 0px 15px 15px #1eecdb;
+            -webkit-box-shadow: 0px 0px 15px 15px #1eec7b;
+            transform: rotate(360deg);
+            -webkit-transform: rotate(360deg);
+      }
+      .imagen {
+        border-radius:4%;
+      }
+
+      body {
+        font-family: 'Roboto', sans-serif;
+      }
+   </style>
+  </head>
+
+  <body>
+    <div class="container"> 
+
+    <header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="http://www.uqroo.mx/">UQROO</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active mr-auto">
+              <a class="nav-link" href="{% url 'hibrido:index' %}">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'hibrido:ubicacion' %}">Dimensionamiento</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'hibrido:configuracionJson' %}">Json</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'hibrido:login' %}">Sign in</a>
+            </li>
+          </ul>
+          
+        </div>
+      </nav>
+    </header>
+    
+    <!-- Begin page content -->
+
+    <main role="main" class="container">
+      {% if error %}
+    <div class="alert alert-danger" role="alert">
+      {{error}}
+    </div>
+    {% endif %}
+    {% if exito %}
+    <div class="alert alert-success" role="alert">
+      {{exito}}
+    </div>
+    {% endif %}
+    
+     
+  
+
+      <div class="jumbotron mt-5">
+        <h1 class="display-5 text-center font-weight-bold">{% block title %} Universidad de Quintana Roo {% endblock %}</h1>
+        <p class="lead text-center">Herramienta de cómputo para el dimensionamiento de un sistema Fotovoltaico-Eólico-Hidrógeno.</p>
+        <hr class="my-4">
+        
+        <!--<p class="lead"> -->
+          {% block content %}
+         <!-- <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a> -->
+         
+          
+         <img class="imagen" src="{% static 'img/mexico.jpeg' %}" width="100%" alt="Foto portada">
+          
+          {% endblock %} 
+       <!--</p>--> 
+       
+      </div>
+    
+    </main>
+    
+    <footer class="card-footer bg-dark">
+    <!--<img  src="{% static 'img/uqroo.png' %}" class="rounded mx-auto d-block abc" alt="Foto pie"> -->
+     <h6 class="text-center text-white">Director de tesis <br> <small class="text-muted font-italic">Dr. Jaime Silverio Ortegón Aguilar</small>  </h6>
+     <h6 class="text-center text-white">Asesores <br> <small class="text-muted font-italic">Dr. Gliserio Romeli Barbosa Pool</small></h6>
+     <h6 class="text-center text-white"><small class="text-muted font-italic">Dr. Javier Vázquez Castillo</small></h6>
+     <h6 class="text-center text-white"><small class="text-muted font-italic text-white">Dr. José Hernández Rodríguez</small></h6>
+     <h6 class="text-center text-white"><small class="text-muted font-italic">Dr. Abimael Rodríguez Sánchez</small></h6>
+     <h6 class="text-center text-white">Tesista <br> <small class="text-muted font-italic">Ing. Gabriel Guzmán Quezada</small></h6> 
+     
+    </footer>
+  </div>
+  
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{%  static 'js/jquery-3.2.1.slim.min.js' %}" ></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  </body>
+</html>

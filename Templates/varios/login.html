@@ -1,0 +1,20 @@
+{% extends 'varios/index.html' %}
+{% block title %} Login {% endblock %}
+
+{% block content %}
+
+      <form method="POST" action="../configuracion/">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="exampleInputEmail1" class="font-weight-bold">Usuario</label>
+          <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+          <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1" class="font-weight-bold">Contraseña</label>
+          <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="loginPassword">
+        </div>
+        <button type="submit" class="btn btn-primary mt-0.5" value="login">Entrar</button>
+     </form>
+    
+{% endblock %}  
