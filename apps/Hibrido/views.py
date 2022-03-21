@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import SolarForm  # Debo importar desde el forms las clases que  utilizaré aquí
 from apps.Hibrido.models import Solar # probando csv
 import math
+import time
 from random import random
 from zipfile import ZipFile
 import zipfile
@@ -282,14 +283,16 @@ def Resultado(request):
     def consumir(latitud, longitud,solar,eolico):
         datos_irradiancia = []
         datos_velocidad_viento = []
-        urls = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-download.json?names=2020&interval=60&utc=false&email=jortegon@gmail.com&attributes=dhi%2Cdni%2Cwind_speed%2Cair_temperature&wkt=POINT({0}+{1})&api_key=nF0gcwQrZsPWndGwVbWSvXD93ixYYlPiO6CblOFF".format(longitud,latitud)
+        urls = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-download.json?names=2020&interval=60&utc=false&email=jortegon@gmail.com&attributes=solar_zenith_angle%2Cdni%2Cwind_speed%2Cair_temperature&wkt=POINT({0}+{1})&api_key=nF0gcwQrZsPWndGwVbWSvXD93ixYYlPiO6CblOFF".format(longitud,latitud)
         try:
             r = requests.post(urls)
             prueba = json.loads(r.text)
             for x in prueba:
                 for x,y in prueba['outputs'].items():
                     if x=="downloadUrl":
+                        time.sleep(5)
                         myfile = requests.get(y)
+                        print(myfile.text)
                         if os.listdir('./datos_solar_eolico/')!=[]: # Si el directorio no está vacío
                             for root, dirs, files in os.walk('./datos_solar_eolico/', topdown=False): # Elimino todo el contenido del direct
                                 for name in files:
@@ -306,8 +309,8 @@ def Resultado(request):
             data = nombre_archivo.read().splitlines()
             reader = csv.DictReader(data)
             for row in reader:
-                datos_irradiancia.append(row['Latitude'])
-                datos_velocidad_viento.append(row['Time Zone'])
+                datos_irradiancia.append(row['Longitude']) #This column has the DNI data
+                datos_velocidad_viento.append(row['Time Zone'])#This column has the wind speed data
             stories_zip.close() # Cierro la conexión del archivo zip
             del datos_irradiancia[0:2]
             del datos_velocidad_viento[0:2]
@@ -346,33 +349,32 @@ def Resultado(request):
         carga_provisional = p3.datos_carga # Obtengo los datos subidos por el usuario en el archivo csv
         carga = []
         dias_mes = [31,28,31,30,31,30,31,31,30,31,30,31]
-        mes=1
-        for datos_carga in carga_provisional:
-            for i in range(dias_mes[mes]):
-                carga.append(round(datos_carga + datos_carga * 0.10 * (random()-0.5),2)) # 10% de variabilidad diaria
+        for idx, datos_carga in enumerate(carga_provisional):
+            for i in range(dias_mes[idx]):
+                carga.append(datos_carga + datos_carga * 0.10 * (random()-0.5)) # 10% de variabilidad diaria
         for z in carga:
             for p in range(24):
-                cargaHora.append(z/24 + z/24 * 0.20 * (random()-0.5),2) # 20% de variabilidad horaria
-        if len(p3.velocidad_vientos) == 0 and p3.elegir_eolico == 'on' and p3.elegir_solar == 'off': # Si el usuario no cargó el archivo con la velocidad del viento y eligió incluir energía eólica en su dimensionamiento
+                cargaHora.append(round(z/24 + z/24 * 0.20 * (random()-0.5),2)) # 20% de variabilidad horaria
+        if len(p3.velocidad_vientos) == 0 and p3.elegir_eolico == 'on' and p3.elegir_solar == 'off': # solo eolico, sin datos
             velocidadViento = consumir(latitud,longitud,p3.elegir_solar,p3.elegir_eolico)
-        if p3.elegir_solar == 'on' and len(p3.Irradiancia) == 0 and p3.elegir_eolico == 'off':
+        if p3.elegir_solar == 'on' and len(p3.Irradiancia) == 0 and p3.elegir_eolico == 'off':# solo solar, sin datos
             irradiancia = consumir(latitud,longitud,p3.elegir_solar,p3.elegir_eolico)
-        if p3.elegir_solar == 'on' and len(p3.Irradiancia) != 0 and p3.elegir_eolico == 'off': # Si el usuario subió un archivo con los valores de la irradiancia
+        if p3.elegir_solar == 'on' and len(p3.Irradiancia) != 0 and p3.elegir_eolico == 'off': # solo solar, con datos
             irradiancia = p3.Irradiancia # Revisar si la irraciancia es en Watt o Kilowatt en el webservice 
-        if p3.elegir_eolico == 'on' and len(p3.velocidad_vientos) != 0 and p3.elegir_solar == 'off': # Si el usuario subió un archivo con las velocidades del viento
+        if p3.elegir_eolico == 'on' and len(p3.velocidad_vientos) != 0 and p3.elegir_solar == 'off': # solo eolico, con datos
             velocidadViento = p3.velocidad_vientos
-        if p3.elegir_solar == 'on' and p3.elegir_eolico == 'on': # En caso que el usuario elija que quiere solar y eólica
-            if len(p3.Irradiancia) != 0 and len(p3.velocidad_vientos) != 0:# Si el usuario subió mediante archivo csv la irradiancia y la velocidad del viento
+        if p3.elegir_solar == 'on' and p3.elegir_eolico == 'on': #  solar y eólica
+            if len(p3.Irradiancia) != 0 and len(p3.velocidad_vientos) != 0:# datos solar y eolico
                 irradiancia = p3.Irradiancia
                 velocidadViento = p3.velocidad_vientos
-            elif len(p3.Irradiancia) != 0 and len(p3.velocidad_vientos) == 0:# subio valores de irradiancia , pero no subió valores de velocidad del viento
+            elif len(p3.Irradiancia) != 0 and len(p3.velocidad_vientos) == 0:# datos solar, eolico online
                 irradiancia = p3.Irradiancia
                 velocidadViento = consumir(latitud,longitud,'off',p3.elegir_eolico)
-            elif len(p3.Irradiancia) == 0 and len(p3.velocidad_vientos) != 0:# subio valores de irradiancia , pero no subió valores de velocidad del viento
+            elif len(p3.Irradiancia) == 0 and len(p3.velocidad_vientos) != 0:# datos eolico, solar online
                 velocidadViento = p3.velocidad_vientos
                 irradiancia = consumir(latitud,longitud,p3.elegir_solar,'off')
-        elif len(p3.Irradiancia) == 0 and len(p3.velocidad_vientos) == 0:
-            irradiancia, velocidadViento = consumir(latitud,longitud,p3.elegir_solar,p3.elegir_eolico)
+            elif len(p3.Irradiancia) == 0 and len(p3.velocidad_vientos) == 0: #sin datos
+                irradiancia, velocidadViento = consumir(latitud,longitud,p3.elegir_solar,p3.elegir_eolico)
     if estado == "carga_o_kwh": #CASO cuando el usuario elige carga en kwh
         cargaHora = p3.datos_carga 
         if len(p3.velocidad_vientos) == 0 and p3.elegir_eolico == 'on' and p3.elegir_solar == "off": # Si el usuario no cargó el archivo con la velocidad del viento y eligió incluir energía eólica en su dimensionamiento
@@ -436,7 +438,8 @@ def Resultado(request):
                 electrolizador = eficienciaElectrolizador * (energia[j] - (carga[j] / inversor))
                 electrolizador = abs(round(electrolizador,2)) # Si la diferencia de energia solar y la carga es demasiado chica, puede dar resul negat
                 #LPSP
-                producida = (energia[j] - electrolizador) * inversor
+                #producida = (energia[j] - electrolizador) * inversor
+                producida = energia[j]
                 energiaProducida.append(producida)
                 eficienciaSistema.append(carga[j] - energiaProducida[j])
                 # FIN LPSP 
@@ -448,7 +451,7 @@ def Resultado(request):
                 energiaProducida.append(producida)
                 eficienciaSistema.append(carga[j] - energiaProducida[j])
                 #FIN LPSP
-        resultado = abs(round(sum(carga)/sum(eficienciaSistema),2))
+        resultado = abs(round(sum(carga)/sum(energiaProducida),2))
         return round(resultado * 100,2)
 
     #Función que calcula el tamaño máximo que debe tener el tanque de H2
@@ -727,13 +730,14 @@ def Resultado(request):
         numeropaneles = []
         capital = []
         mantenimiento = []
+        result = sorted(algorithm.result, key=lambda solution: solution.objectives[2])
         for solution in algorithm.result:
             print(solution.objectives)
-            numero_aerogeneradores = round(solution.objectives[1],2)# Para la gráfica
+            numero_aerogeneradores = round(solution.objectives[1]) if round(solution.objectives[1]) >= solution.objectives[1] else round(solution.objectives[1])+1 # Para la gráfica
             areaSolar = solution.objectives[0]# Para la gráfica
             #resultados.append(solution.objectives[0])
-            numeroaerogeneradores.append(round(solution.objectives[1],2))# Siempre redondeo un número arriba
-            numeropaneles.append(round(solution.objectives[0],2))
+            numeroaerogeneradores.append(round(solution.objectives[1]) if round(solution.objectives[1]) >= solution.objectives[1] else round(solution.objectives[1])+1)# Siempre redondeo un número arriba
+            numeropaneles.append(round(solution.objectives[0]) if round(solution.objectives[0]) >= solution.objectives[0] else round(solution.objectives[0])+1)
             capital.append(round(solution.objectives[2],2))
             mantenimiento.append(round(solution.objectives[3],2))
         zlista = zip(numeropaneles,numeroaerogeneradores,capital,mantenimiento) # listas comprimidas
