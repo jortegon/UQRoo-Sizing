@@ -25,6 +25,9 @@ from gpcharts import figure #https://github.com/Dfenestrator/GooPyCharts
 import csv, io
 from django.contrib import messages
 
+MAIL = 'micorreo@sitio.com'
+NREL_ID = 'asdifausifhlasjdnfasdf'
+
 # Ejecutar django desde anaconda python manage.py runserver
 def index(request):
     return render(request,'varios/index.html')
@@ -283,7 +286,9 @@ def Resultado(request):
     def consumir(latitud, longitud,solar,eolico):
         datos_irradiancia = []
         datos_velocidad_viento = []
-        urls = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-download.json?names=2020&interval=60&utc=false&email=jortegon@gmail.com&attributes=solar_zenith_angle%2Cdni%2Cwind_speed%2Cair_temperature&wkt=POINT({0}+{1})&api_key=nF0gcwQrZsPWndGwVbWSvXD93ixYYlPiO6CblOFF".format(longitud,latitud)
+        urls = "https://developer.nrel.gov/api/nsrdb/v2/solar/psm3-download.json?names=2020&interval=60&utc=false&email="+MAIL
+        urls = urls + "&attributes=solar_zenith_angle%2Cdni%2Cwind_speed%2Cair_temperature&wkt=POINT({0}+{1})".format(longitud,latitud)
+        urls = urls + "&api_key=" + NREL_ID
         try:
             r = requests.post(urls)
             prueba = json.loads(r.text)
@@ -291,7 +296,6 @@ def Resultado(request):
                 for x,y in prueba['outputs'].items():
                     if x=="downloadUrl":
                         time.sleep(5)
-                        myfile = requests.get(y)
                         print(myfile.text)
                         if os.listdir('./datos_solar_eolico/')!=[]: # Si el directorio no está vacío
                             for root, dirs, files in os.walk('./datos_solar_eolico/', topdown=False): # Elimino todo el contenido del direct
